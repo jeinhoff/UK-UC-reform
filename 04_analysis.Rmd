@@ -1,0 +1,93 @@
+---
+title: "01_preprocessing"
+author: "Jan"
+date: "2024-12-24"
+---
+
+```{r setup}
+if (!require("tidyverse")) install.packages("tidyverse")
+if (!require("broom")) install.packages("broom")
+if (!require("fixest")) install.packages("fixest")
+if (!require("DIDmultiplegtDYN")) install.packages("DIDmultiplegtDYN")
+
+library("tidyverse")
+library("broom")
+library("fixest")
+library("DIDmultiplegtDYN")
+
+rm(list = ls())
+
+load("data_processed/02_data_final.RData")
+
+```
+
+```{r}
+data_final <- data_final %>% filter(hh_benefit_income_eq >= 0 & time_to_reform %in% c(-36:36))
+
+model_twowayfixed <- feols(hh_net_income_eq ~ eligible * unemployed + 
+                           age + gender + marital_status + education_level + children_in_hh |
+                           person_id + lad_code + int_year, 
+                           cluster = ~ household_id + lad_code, 
+                           data = data_final) %>% tidy()
+model_twowayfixed <- model_twowayfixed %>% filter(term == "eligible:unemployed") %>% mutate(term = "TWFE")
+
+model_sunabraham <- feols(hh_net_income_eq ~ sunab(eligible, unemployed) + 
+                          age + gender + marital_status + education_level + children_in_hh |
+                          person_id + lad_code + int_year, 
+                          cluster = ~ household_id + lad_code, 
+                          data = data_final) %>% tidy()
+model_sunabraham <- model_sunabraham %>% filter(term == "sunab(eligible, unemployed)") %>% mutate(term = "Sun & Abraham (2020)")
+
+models <- rbind(model_twowayfixed, model_sunabraham)
+
+models <- models %>%
+  mutate(sig = case_when(
+    p.value <= 0.001 ~ "***",
+    p.value <= 0.01 ~ "**",
+    p.value <= 0.05 ~ "*",
+    p.value > 0.05 ~ ""))
+
+ggplot(models, aes(x = term, y = estimate)) +
+  coord_flip() +
+  geom_hline(yintercept = 0, linetype = "dashed", color = "red", size = 0.5) +
+  geom_point() +
+  geom_text(aes(label = paste0(round(estimate, 1), sig)), vjust = -1) +
+  geom_linerange(aes(ymin = estimate - 2.576 * std.error, ymax = estimate + 2.576 * std.error), size = 0.6) +
+  geom_linerange(aes(ymin = estimate - 1.96 * std.error, ymax = estimate + 1.96 * std.error), size = 1) +
+  scale_y_continuous("ATE (in £)", breaks = seq(-10000, 10000, 50)) +
+  scale_x_discrete("Estimator") +
+  theme_linedraw()
+ggsave("outputs/results_ate_benefits.png", width = 6, height = 2.5)
+
+```
+
+
+
+
+```{r}
+test <- did_multiplegt_dyn(data_final, 'hh_net_income_eq', 'person_id', 'time_to_reform', 'treated')
+
+print(test$plot)
+
+```
+
+```{r}
+mod_twfe <- feols(hh_net_income_eq ~ i(time_to_reform, unemployed, ref = -1) +
+                    age + marital_status + education_level + household_size | 
+                    person_id + date,
+                  cluster = ~ household_id + lad_code,
+                 data = data_final)
+
+mod_sa <- feols(hh_net_income_eq ~ sunab(unemployed, time_to_reform) +
+                    age + marital_status + education_level + household_size | 
+                    person_id + date,
+                  cluster = ~ household_id + lad_code,
+                 data = data_final)
+
+iplot(list(mod_twfe, mod_sa), sep = 0.5, ref.line = -1,
+      xlab = 'Time to treatment',
+      main = 'Event study: Staggered treatment')
+legend("bottomright", col = c(1, 2), pch = c(20, 17), 
+       legend = c("TWFE", "Sun & Abraham (2020)"))
+
+```

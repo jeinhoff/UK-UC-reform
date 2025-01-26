@@ -1,0 +1,127 @@
+---
+title: "01_preprocessing"
+author: "Jan"
+date: "2024-12-24"
+---
+
+```{r setup}
+if (!require("tidyverse")) install.packages("tidyverse")
+if (!require("rio")) install.packages("rio")
+if (!require("panelView")) install.packages("panelView")
+if (!require("sf")) install.packages("sf")
+
+library("tidyverse")
+library("rio")
+library("panelView")
+library("sf")
+
+rm(list = ls())
+
+load("data_processed/02_data_final.RData")
+
+```
+
+```{r}
+lad_codes <- import("data_raw/lad_codes.xlsx")
+
+rollout_schedule <- import("data_raw/rollout_schedule.xlsx")
+
+rollout_schedule$uc_start_date <- as.Date(rollout_schedule$uc_start_date, format =  "%d.%m.%Y")
+
+rollout_schedule <- rollout_schedule %>% group_by(lad_name) %>% filter(uc_start_date == min(uc_start_date)) %>% slice(1)
+
+rollout_schedule <- lad_codes %>% left_join(rollout_schedule, by = c("lad_name"))
+
+```
+
+
+```{r}
+#panelView::panelview(hh_net_income ~ treated, data = data_final, index = c("person_id", "int_year"))
+
+rollout_plot <- rollout_schedule %>%
+ transmute(lad_code,
+           date = list(seq(as.Date("01/01/2014", format = "%d/%m/%Y"), as.Date("31/12/2020", format = "%d/%m/%Y"), by = "month"))) %>%
+ unnest(date)
+
+rollout_plot <- rollout_plot %>% 
+  left_join(rollout_schedule, by = "lad_code") %>% 
+  mutate(post_reform = ifelse(uc_start_date <= date, 1, 0))
+
+ggplot(rollout_plot, aes(x = date, y = lad_name_short, fill = as.factor(post_reform))) +
+  geom_tile() +
+  scale_fill_brewer(palette = "Set1")
+ggsave("outputs/plot_rollout.png", width = 25, height = 8, limitsize = F)
+
+```
+
+```{r}
+rollout_map <- read_sf("data_raw/Local_Authority_Districts_May_2024_Boundaries_UK_BFE_-5758551109064458912/LAD_MAY_2024_UK_BFE.shp")
+
+rollout_map <- rollout_map %>% left_join(rollout_schedule, by = c("LAD24CD" = "lad_code"))
+
+rollout_map_2013 <- rollout_map %>% filter(uc_start_date >= as.Date("2013-01-01") & uc_start_date <= as.Date("2013-12-31"))
+rollout_map_2014 <- rollout_map %>% filter(uc_start_date >= as.Date("2014-01-01") & uc_start_date <= as.Date("2014-12-31"))
+rollout_map_2015 <- rollout_map %>% filter(uc_start_date >= as.Date("2015-01-01") & uc_start_date <= as.Date("2015-12-31"))
+rollout_map_2016 <- rollout_map %>% filter(uc_start_date >= as.Date("2016-01-01") & uc_start_date <= as.Date("2016-12-31"))
+rollout_map_2017 <- rollout_map %>% filter(uc_start_date >= as.Date("2017-01-01") & uc_start_date <= as.Date("2017-12-31"))
+rollout_map_2018 <- rollout_map %>% filter(uc_start_date >= as.Date("2018-01-01") & uc_start_date <= as.Date("2018-12-31"))
+
+ggplot() +
+  geom_sf(data = rollout_map$geometry, fill = "lightgrey", color = "black") +
+  geom_sf(data = rollout_map_2013$geometry, fill = "red", color = "black") +
+  theme_void()
+ggsave("outputs/rollout_map_2013.png", height = 6, width = 4)
+
+ggplot() +
+  geom_sf(data = rollout_map$geometry, fill = "lightgrey", color = "black") +
+  geom_sf(data = rollout_map_2013$geometry, fill = "lightgreen", color = "black") +
+  geom_sf(data = rollout_map_2014$geometry, fill = "red", color = "black") +
+  theme_void()
+ggsave("outputs/rollout_map_2014.png", height = 6, width = 4)
+
+ggplot() +
+  geom_sf(data = rollout_map$geometry, fill = "lightgrey", color = "black") +
+  geom_sf(data = rollout_map_2013$geometry, fill = "lightgreen", color = "black") +
+  geom_sf(data = rollout_map_2014$geometry, fill = "lightgreen", color = "black") +
+  geom_sf(data = rollout_map_2015$geometry, fill = "red", color = "black") +
+  theme_void()
+ggsave("outputs/rollout_map_2015.png", height = 6, width = 4)
+
+ggplot() +
+  geom_sf(data = rollout_map$geometry, fill = "lightgrey", color = "black") +
+  geom_sf(data = rollout_map_2013$geometry, fill = "lightgreen", color = "black") +
+  geom_sf(data = rollout_map_2014$geometry, fill = "lightgreen", color = "black") +
+  geom_sf(data = rollout_map_2015$geometry, fill = "lightgreen", color = "black") +
+  geom_sf(data = rollout_map_2016$geometry, fill = "red", color = "black") +
+  theme_void()
+ggsave("outputs/rollout_map_2016.png", height = 6, width = 4)
+
+ggplot() +
+  geom_sf(data = rollout_map$geometry, fill = "lightgrey", color = "black") +
+  geom_sf(data = rollout_map_2013$geometry, fill = "lightgreen", color = "black") +
+  geom_sf(data = rollout_map_2014$geometry, fill = "lightgreen", color = "black") +
+  geom_sf(data = rollout_map_2015$geometry, fill = "lightgreen", color = "black") +
+  geom_sf(data = rollout_map_2016$geometry, fill = "lightgreen", color = "black") +
+  geom_sf(data = rollout_map_2017$geometry, fill = "red", color = "black") +
+  theme_void()
+ggsave("outputs/rollout_map_2017.png", height = 6, width = 4)
+
+ggplot() +
+  geom_sf(data = rollout_map$geometry, fill = "lightgrey", color = "black") +
+  geom_sf(data = rollout_map_2013$geometry, fill = "lightgreen", color = "black") +
+  geom_sf(data = rollout_map_2014$geometry, fill = "lightgreen", color = "black") +
+  geom_sf(data = rollout_map_2015$geometry, fill = "lightgreen", color = "black") +
+  geom_sf(data = rollout_map_2016$geometry, fill = "lightgreen", color = "black") +
+  geom_sf(data = rollout_map_2017$geometry, fill = "lightgreen", color = "black") +
+  geom_sf(data = rollout_map_2018$geometry, fill = "red", color = "black") +
+  theme_void()
+ggsave("outputs/rollout_map_2018.png", height = 6, width = 4)
+
+rm(rollout_map, rollout_map_2013, rollout_map_2014, rollout_map_2015, rollout_map_2016, rollout_map_2017, rollout_map_2018)
+
+```
+
+```{r}
+
+```
+

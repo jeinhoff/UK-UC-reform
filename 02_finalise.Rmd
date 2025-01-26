@@ -1,0 +1,171 @@
+---
+title: "02_finalise"
+author: "Jan"
+date: "2024-12-24"
+---
+
+```{r setup}
+if (!require("tidyverse")) install.packages("tidyverse")
+if (!require("rio")) install.packages("rio")
+
+library("tidyverse")
+library("rio")
+
+rm(list = ls())
+
+load("data_processed/01_data_preprocessed.RData")
+
+```
+
+# gender
+```{r}
+data_preprocessed <- data_preprocessed %>%
+  mutate(gender = case_when(
+    gender %in% c(1) ~ "male",
+    gender %in% c(2) ~ "female",
+    T ~ NA_character_))
+
+```
+
+# gov_region
+```{r}
+data_preprocessed <- data_preprocessed %>%
+  mutate(gov_region = case_when(
+    gov_region %in% c(1) ~ "North East",
+    gov_region %in% c(2) ~ "North West",
+    gov_region %in% c(3) ~ "Yorkshire and the Humber",
+    gov_region %in% c(4) ~ "East Midlands",
+    gov_region %in% c(5) ~ "West Midlands",
+    gov_region %in% c(6) ~ "East of England",
+    gov_region %in% c(7) ~ "London",
+    gov_region %in% c(8) ~ "South East",
+    gov_region %in% c(9) ~ "South West",
+    gov_region %in% c(10) ~ "Wales",
+    gov_region %in% c(11) ~ "Scotland",
+    gov_region %in% c(12) ~ "Northern Ireland",
+    T ~ NA_character_))
+
+```
+
+# education_level
+```{r}
+data_preprocessed <- data_preprocessed %>%
+  mutate(education_level = case_when(
+    education_level %in% c(1, 2) ~ "High (Degree or other higher qualification)",
+    education_level %in% c(3, 4) ~ "Medium (A level, GCSE, etc.)",
+    education_level %in% c(5) ~ "Other qualification",
+    education_level %in% c(9) ~ "No qualification",
+    T ~ NA_character_))
+
+table(data_preprocessed$education_level)
+```
+
+# job_status
+```{r}
+data_preprocessed <- data_preprocessed %>%
+  mutate(employment_status = case_when(
+    job_status %in% c(1, 2) ~ "Employed",
+    job_status %in% c(3) ~ "Unemployed",
+    job_status %in% c(4) ~ "Retired",
+    job_status %in% c(5:97) ~ "Other/Inactive",
+    T ~ NA_character_))
+
+```
+
+# marital_status
+```{r}
+data_preprocessed <- data_preprocessed %>%
+  mutate(marital_status = case_when(
+    marital_status %in% c(1) ~ "Single",
+    marital_status %in% c(2, 3, 10) ~ "Married/partnered",
+    marital_status %in% c(4, 5, 7, 8) ~ "Divorved/separated",
+    marital_status %in% c(6, 9) ~ "Widowed"))
+
+```
+
+# hh_net_income, hh_benefit_income
+```{r}
+data_preprocessed <- data_preprocessed %>% 
+  mutate(hh_net_income_eq = hh_net_income / sqrt(household_size),
+         hh_benefit_income_eq = hh_benefit_income / sqrt(household_size))
+
+```
+
+# lads
+```{r}
+lad_codes <- import("data_raw/lad_codes.xlsx")
+
+data_preprocessed <- data_preprocessed %>% left_join(lad_codes, by = c("lad_code")) %>% select(-c("lad_name_short"))
+
+rm(lad_codes)
+
+```
+
+# rollout
+```{r}
+rollout_schedule <- import("data_raw/rollout_schedule.xlsx")
+
+rollout_schedule$uc_start_date <- as.Date(rollout_schedule$uc_start_date, format =  "%d.%m.%Y")
+
+rollout_schedule <- rollout_schedule %>% group_by(lad_name) %>% filter(uc_start_date == min(uc_start_date)) %>% slice(1)
+
+data_preprocessed <- data_preprocessed %>% left_join(rollout_schedule, by = c("lad_name"))
+
+data_preprocessed$date <- as.Date(paste0("01.", data_preprocessed$int_month, ".", data_preprocessed$int_year), format =  "%d.%m.%Y")
+
+rm(rollout_schedule)
+
+```
+
+# define treatment
+```{r}
+### ADD N CHiLDREN IN househoLD
+
+# pre/post reform
+data_preprocessed <- data_preprocessed %>%
+  mutate(eligible = case_when(
+    date >= as.Date("01.04.2013", format = "%d.%m.%Y") & date < as.Date("01.06.2014", format = "%d.%m.%Y") & date >= uc_start_date & !job_status %in% c(1, 7) & marital_status %in% c("Single") & children_in_hh == 0 ~ 1,
+    date >= as.Date("01.07.2014", format = "%d.%m.%Y") & date < as.Date("01.12.2015", format = "%d.%m.%Y") & date >= uc_start_date & !job_status %in% c(1, 7) & marital_status %in% c("Single", "Married/partnered") & children_in_hh == 0 ~ 1,
+    date >= as.Date("01.01.2016", format = "%d.%m.%Y") & date < as.Date("01.05.2019", format = "%d.%m.%Y") & date >= uc_start_date & !job_status %in% c(1, 7) ~ 1,
+    T ~ 0))
+
+# eligible
+data_preprocessed$unemployed <- ifelse(data_preprocessed$employment_status == "Unemployed", 1, 0)
+
+# treated
+data_preprocessed$treated <- ifelse(data_preprocessed$eligible == 1 & data_preprocessed$unemployed == 1, 1, 0)
+  
+# month to/from treatment
+data_preprocessed$time_to_reform <- interval(data_preprocessed$uc_start_date, data_preprocessed$date) %/% years(1)
+
+```
+
+# select sample
+```{r}
+data_final <- data_preprocessed %>% filter(age %in% c(18:60))
+
+data_final <- data_final %>% filter(int_year %in% c(2010:2020))
+
+data_final <- data_final %>% select(person_id, household_id, gender, year_born, age, date, int_year, int_month, time_to_reform, eligible, unemployed, treated, education_level, employment_status, marital_status, children_in_hh, household_size, hh_net_income, hh_net_income_eq, hh_benefit_income, hh_benefit_income_eq, gov_region, lad_code, lad_name, uc_start_date)
+
+data_final <- data_final %>% na.omit()
+
+data_final <- data_final %>% group_by(person_id, int_year) %>% slice(1)
+
+data_final <- data_final %>% arrange(person_id, age)
+
+data_final <- data_final %>% ungroup()
+
+rm(data_preprocessed)
+
+```
+
+# save data
+```{r}
+save.image("data_processed/02_data_final.RData")
+
+```
+
+```{r}
+
+```

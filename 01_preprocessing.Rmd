@@ -1,0 +1,482 @@
+---
+title: "01_preprocessing"
+author: "Jan"
+date: "2024-12-24"
+---
+
+```{r setup}
+if (!require("tidyverse")) install.packages("tidyverse")
+if (!require("here")) install.packages("here")
+if (!require("rio")) install.packages("rio")
+
+library("tidyverse")
+library("here")
+library("rio")
+
+rm(list = ls())
+
+path_bhps <- paste0(here(), "/data_raw/UKDA-6614-stata/stata/stata13_se/bhps/")
+path_ukhls <- paste0(here(), "/data_raw/UKDA-6614-stata/stata/stata13_se/ukhls/")
+path_bhps_lad <- paste0(here(), "/data_raw/UKDA-6666-stata/stata/stata13/bhps/")
+path_ukhls_lad <- paste0(here(), "/data_raw/UKDA-6666-stata/stata/stata13/ukhls/")
+
+waves_bhps <- c("ba", "bb", "bc", "bd", "be", "bf", "bg", "bh", "bi", "bj", "bk", "bl", "bm", "bn", "bo", "bp", "bq", "br")
+waves_ukhls <- c("a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n")
+
+```
+
+Included variables:
+ - "data_code"
+ - "person_id"
+ - "household_id"
+ - "int_year"
+ - "int_month"
+ - "gender"
+ - "year_born"
+ - "age"
+ - "gov_region"
+ - "education_level"
+ - "job_status"
+ - "lad_code"
+ - "children_in_hh"
+ - "marital_status"
+ - "hh_net_income"
+ - "hh_benefit_income"
+ - "household_size"
+
+Missing variables:
+ - "siblings_in_hh"
+ - "parents_alive"
+ - "transfer_from_"
+ - "transfer_to_"
+
+# BHPS waves (1991-2008)
+## basevars
+```{r}
+bhps_1 <- import(paste0(path_bhps, waves_bhps[1], "_indresp.dta"))
+bhps_1 <- bhps_1 %>% mutate(data_code = "bhps_ba") %>% select(data_code, pidp, ba_hidp, ba_istrtdaty, ba_istrtdatm, ba_sex, ba_doby, ba_age, ba_gor_dv, ba_hiqual_dv, ba_jbstat, ba_mastat, ba_hhsize)
+colnames(bhps_1) <- c("data_code", "person_id", "household_id", "int_year", "int_month", "gender", "year_born", "age", "gov_region", "education_level", "job_status", "marital_status", "household_size")
+
+bhps_2 <- import(paste0(path_bhps, waves_bhps[2], "_indresp.dta"))
+bhps_2 <- bhps_2 %>% mutate(data_code = "bhps_bb") %>% select(data_code, pidp, bb_hidp, bb_istrtdaty, bb_istrtdatm, bb_sex, bb_doby, bb_age, bb_gor_dv, bb_hiqual_dv, bb_jbstat, bb_mastat, bb_hhsize)
+colnames(bhps_2) <- c("data_code", "person_id", "household_id", "int_year", "int_month", "gender", "year_born", "age", "gov_region", "education_level", "job_status", "marital_status", "household_size")
+
+bhps_3 <- import(paste0(path_bhps, waves_bhps[3], "_indresp.dta"))
+bhps_3 <- bhps_3 %>% mutate(data_code = "bhps_bc") %>% select(data_code, pidp, bc_hidp, bc_istrtdaty, bc_istrtdatm, bc_sex, bc_doby, bc_age, bc_gor_dv, bc_hiqual_dv, bc_jbstat, bc_mastat, bc_hhsize)
+colnames(bhps_3) <- c("data_code", "person_id", "household_id", "int_year", "int_month", "gender", "year_born", "age", "gov_region", "education_level", "job_status", "marital_status", "household_size")
+
+bhps_4 <- import(paste0(path_bhps, waves_bhps[4], "_indresp.dta"))
+bhps_4 <- bhps_4 %>% mutate(data_code = "bhps_bd") %>% select(data_code, pidp, bd_hidp, bd_istrtdaty, bd_istrtdatm, bd_sex, bd_doby, bd_age, bd_gor_dv, bd_hiqual_dv, bd_jbstat, bd_mastat, bd_hhsize)
+colnames(bhps_4) <- c("data_code", "person_id", "household_id", "int_year", "int_month", "gender", "year_born", "age", "gov_region", "education_level", "job_status", "marital_status", "household_size")
+
+bhps_5 <- import(paste0(path_bhps, waves_bhps[5], "_indresp.dta"))
+bhps_5 <- bhps_5 %>% mutate(data_code = "bhps_be") %>% select(data_code, pidp, be_hidp, be_istrtdaty, be_istrtdatm, be_sex, be_doby, be_age, be_gor_dv, be_hiqual_dv, be_jbstat, be_mastat, be_hhsize)
+colnames(bhps_5) <- c("data_code", "person_id", "household_id", "int_year", "int_month", "gender", "year_born", "age", "gov_region", "education_level", "job_status", "marital_status", "household_size")
+
+bhps_6 <- import(paste0(path_bhps, waves_bhps[6], "_indresp.dta"))
+bhps_6 <- bhps_6 %>% mutate(data_code = "bhps_bf") %>% select(data_code, pidp, bf_hidp, bf_istrtdaty, bf_istrtdatm, bf_sex, bf_doby, bf_age, bf_gor_dv, bf_hiqual_dv, bf_jbstat, bf_mastat, bf_hhsize)
+colnames(bhps_6) <- c("data_code", "person_id", "household_id", "int_year", "int_month", "gender", "year_born", "age", "gov_region", "education_level", "job_status", "marital_status", "household_size")
+
+bhps_7 <- import(paste0(path_bhps, waves_bhps[7], "_indresp.dta"))
+bhps_7 <- bhps_7 %>% mutate(data_code = "bhps_bg") %>% select(data_code, pidp, bg_hidp, bg_istrtdaty, bg_istrtdatm, bg_sex, bg_doby, bg_age, bg_gor_dv, bg_hiqual_dv, bg_jbstat, bg_mastat, bg_hhsize)
+colnames(bhps_7) <- c("data_code", "person_id", "household_id", "int_year", "int_month", "gender", "year_born", "age", "gov_region", "education_level", "job_status", "marital_status", "household_size")
+
+bhps_8 <- import(paste0(path_bhps, waves_bhps[8], "_indresp.dta"))
+bhps_8 <- bhps_8 %>% mutate(data_code = "bhps_bh") %>% select(data_code, pidp, bh_hidp, bh_istrtdaty, bh_istrtdatm, bh_sex, bh_doby, bh_age, bh_gor_dv, bh_hiqual_dv, bh_jbstat, bh_mastat, bh_hhsize)
+colnames(bhps_8) <- c("data_code", "person_id", "household_id", "int_year", "int_month", "gender", "year_born", "age", "gov_region", "education_level", "job_status", "marital_status", "household_size")
+
+bhps_9 <- import(paste0(path_bhps, waves_bhps[9], "_indresp.dta"))
+bhps_9 <- bhps_9 %>% mutate(data_code = "bhps_bi") %>% select(data_code, pidp, bi_hidp, bi_istrtdaty, bi_istrtdatm, bi_sex, bi_doby, bi_age, bi_gor_dv, bi_hiqual_dv, bi_jbstat, bi_mastat, bi_hhsize)
+colnames(bhps_9) <- c("data_code", "person_id", "household_id", "int_year", "int_month", "gender", "year_born", "age", "gov_region", "education_level", "job_status", "marital_status", "household_size")
+
+bhps_10 <- import(paste0(path_bhps, waves_bhps[10], "_indresp.dta"))
+bhps_10 <- bhps_10 %>% mutate(data_code = "bhps_bj") %>% select(data_code, pidp, bj_hidp, bj_istrtdaty, bj_istrtdatm, bj_sex, bj_doby, bj_age, bj_gor_dv, bj_hiqual_dv, bj_jbstat, bj_mastat, bj_hhsize)
+colnames(bhps_10) <- c("data_code", "person_id", "household_id", "int_year", "int_month", "gender", "year_born", "age", "gov_region", "education_level", "job_status", "marital_status", "household_size")
+
+bhps_11 <- import(paste0(path_bhps, waves_bhps[11], "_indresp.dta"))
+bhps_11 <- bhps_11 %>% mutate(data_code = "bhps_bk") %>% select(data_code, pidp, bk_hidp, bk_istrtdaty, bk_istrtdatm, bk_sex, bk_doby, bk_age, bk_gor_dv, bk_hiqual_dv, bk_jbstat, bk_mastat, bk_hhsize)
+colnames(bhps_11) <- c("data_code", "person_id", "household_id", "int_year", "int_month", "gender", "year_born", "age", "gov_region", "education_level", "job_status", "marital_status", "household_size")
+
+bhps_12 <- import(paste0(path_bhps, waves_bhps[12], "_indresp.dta"))
+bhps_12 <- bhps_12 %>% mutate(data_code = "bhps_bl") %>% select(data_code, pidp, bl_hidp, bl_istrtdaty, bl_istrtdatm, bl_sex, bl_doby, bl_age, bl_gor_dv, bl_hiqual_dv, bl_jbstat, bl_mastat, bl_hhsize)
+colnames(bhps_12) <- c("data_code", "person_id", "household_id", "int_year", "int_month", "gender", "year_born", "age", "gov_region", "education_level", "job_status", "marital_status", "household_size")
+
+bhps_13 <- import(paste0(path_bhps, waves_bhps[13], "_indresp.dta"))
+bhps_13 <- bhps_13 %>% mutate(data_code = "bhps_bm") %>% select(data_code, pidp, bm_hidp, bm_istrtdaty, bm_istrtdatm, bm_sex, bm_doby, bm_age, bm_gor_dv, bm_hiqual_dv, bm_jbstat, bm_mastat, bm_hhsize)
+colnames(bhps_13) <- c("data_code", "person_id", "household_id", "int_year", "int_month", "gender", "year_born", "age", "gov_region", "education_level", "job_status", "marital_status", "household_size")
+
+bhps_14 <- import(paste0(path_bhps, waves_bhps[14], "_indresp.dta"))
+bhps_14 <- bhps_14 %>% mutate(data_code = "bhps_bn") %>% select(data_code, pidp, bn_hidp, bn_istrtdaty, bn_istrtdatm, bn_sex, bn_doby, bn_age, bn_gor_dv, bn_hiqual_dv, bn_jbstat, bn_mastat, bn_hhsize)
+colnames(bhps_14) <- c("data_code", "person_id", "household_id", "int_year", "int_month", "gender", "year_born", "age", "gov_region", "education_level", "job_status", "marital_status", "household_size")
+
+bhps_15 <- import(paste0(path_bhps, waves_bhps[15], "_indresp.dta"))
+bhps_15 <- bhps_15 %>% mutate(data_code = "bhps_bo") %>% select(data_code, pidp, bo_hidp, bo_istrtdaty, bo_istrtdatm, bo_sex, bo_doby, bo_age, bo_gor_dv, bo_hiqual_dv, bo_jbstat, bo_mastat, bo_hhsize)
+colnames(bhps_15) <- c("data_code", "person_id", "household_id", "int_year", "int_month", "gender", "year_born", "age", "gov_region", "education_level", "job_status", "marital_status", "household_size")
+
+bhps_16 <- import(paste0(path_bhps, waves_bhps[16], "_indresp.dta"))
+bhps_16 <- bhps_16 %>% mutate(data_code = "bhps_bp") %>% select(data_code, pidp, bp_hidp, bp_istrtdaty, bp_istrtdatm, bp_sex, bp_doby, bp_age, bp_gor_dv, bp_hiqual_dv, bp_jbstat, bp_mastat, bp_hhsize)
+colnames(bhps_16) <- c("data_code", "person_id", "household_id", "int_year", "int_month", "gender", "year_born", "age", "gov_region", "education_level", "job_status", "marital_status", "household_size")
+
+bhps_17 <- import(paste0(path_bhps, waves_bhps[17], "_indresp.dta"))
+bhps_17 <- bhps_17 %>% mutate(data_code = "bhps_bq") %>% select(data_code, pidp, bq_hidp, bq_istrtdaty, bq_istrtdatm, bq_sex, bq_doby, bq_age, bq_gor_dv, bq_hiqual_dv, bq_jbstat, bq_mastat, bq_hhsize)
+colnames(bhps_17) <- c("data_code", "person_id", "household_id", "int_year", "int_month", "gender", "year_born", "age", "gov_region", "education_level", "job_status", "marital_status", "household_size")
+
+bhps_18 <- import(paste0(path_bhps, waves_bhps[18], "_indresp.dta"))
+bhps_18 <- bhps_18 %>% mutate(data_code = "bhps_br") %>% select(data_code, pidp, br_hidp, br_istrtdaty, br_istrtdatm, br_sex, br_doby, br_age, br_gor_dv, br_hiqual_dv, br_jbstat, br_mastat, br_hhsize)
+colnames(bhps_18) <- c("data_code", "person_id", "household_id", "int_year", "int_month", "gender", "year_born", "age", "gov_region", "education_level", "job_status", "marital_status", "household_size")
+
+# combine waves
+data_bhps_basevars <- bhps_1 %>% bind_rows(bhps_2, bhps_3, bhps_4, bhps_5, bhps_6, bhps_7, bhps_8, bhps_9, bhps_10, bhps_11, bhps_12, bhps_13, bhps_14, bhps_15, bhps_16, bhps_17, bhps_18)
+
+rm(bhps_1, bhps_2, bhps_3, bhps_4, bhps_5, bhps_6, bhps_7, bhps_8, bhps_9, bhps_10, bhps_11, bhps_12, bhps_13, bhps_14, bhps_15, bhps_16, bhps_17, bhps_18)
+
+```
+
+# UKHLS waves (2009-2023)
+## basevars
+```{r}
+ukhls_1 <- import(paste0(path_ukhls, waves_ukhls[1], "_indresp.dta"))
+ukhls_1 <- ukhls_1 %>% mutate(data_code = "ukhls_a") %>% select(data_code, pidp, a_hidp, a_istrtdaty, a_istrtdatm, a_dvage, a_sex, a_birthy, a_gor_dv, a_hiqual_dv, a_jbstat, a_marstat_dv, a_hhsize)
+colnames(ukhls_1) <- c("data_code", "person_id", "household_id", "int_year", "int_month", "age", "gender", "year_born", "gov_region", "education_level", "job_status", "marital_status", "household_size")
+
+ukhls_2 <- import(paste0(path_ukhls, waves_ukhls[2], "_indresp.dta"))
+ukhls_2 <- ukhls_2 %>% mutate(data_code = "ukhls_b") %>% select(data_code, pidp, b_hidp, b_istrtdaty, b_istrtdatm, b_dvage, b_sex, b_birthy, b_gor_dv, b_hiqual_dv, b_jbstat, b_marstat_dv, b_hhsize)
+colnames(ukhls_2) <- c("data_code", "person_id", "household_id", "int_year", "int_month", "age", "gender", "year_born", "gov_region", "education_level", "job_status", "marital_status", "household_size")
+
+ukhls_3 <- import(paste0(path_ukhls, waves_ukhls[3], "_indresp.dta"))
+ukhls_3 <- ukhls_3 %>% mutate(data_code = "ukhls_c") %>% select(data_code, pidp, c_hidp, c_istrtdaty, c_istrtdatm, c_dvage, c_sex, c_birthy, c_gor_dv, c_hiqual_dv, c_jbstat, c_marstat_dv, c_hhsize)
+colnames(ukhls_3) <- c("data_code", "person_id", "household_id", "int_year", "int_month", "age", "gender", "year_born", "gov_region", "education_level", "job_status", "marital_status", "household_size")
+
+ukhls_4 <- import(paste0(path_ukhls, waves_ukhls[4], "_indresp.dta"))
+ukhls_4 <- ukhls_4 %>% mutate(data_code = "ukhls_d") %>% select(data_code, pidp, d_hidp, d_istrtdaty, d_istrtdatm, d_dvage, d_sex, d_birthy, d_gor_dv, d_hiqual_dv, d_jbstat, d_marstat_dv, d_hhsize)
+colnames(ukhls_4) <- c("data_code", "person_id", "household_id", "int_year", "int_month", "age", "gender", "year_born", "gov_region", "education_level", "job_status", "marital_status", "household_size")
+
+ukhls_5 <- import(paste0(path_ukhls, waves_ukhls[5], "_indresp.dta"))
+ukhls_5 <- ukhls_5 %>% mutate(data_code = "ukhls_e") %>% select(data_code, pidp, e_hidp, e_istrtdaty, e_istrtdatm, e_dvage, e_sex, e_birthy, e_gor_dv, e_hiqual_dv, e_jbstat, e_marstat_dv, e_hhsize)
+colnames(ukhls_5) <- c("data_code", "person_id", "household_id", "int_year", "int_month", "age", "gender", "year_born", "gov_region", "education_level", "job_status", "marital_status", "household_size")
+
+ukhls_6 <- import(paste0(path_ukhls, waves_ukhls[6], "_indresp.dta"))
+ukhls_6 <- ukhls_6 %>% mutate(data_code = "ukhls_f") %>% select(data_code, pidp, f_hidp, f_istrtdaty, f_istrtdatm, f_dvage, f_sex, f_birthy, f_gor_dv, f_hiqual_dv, f_jbstat, f_marstat_dv, f_hhsize)
+colnames(ukhls_6) <- c("data_code", "person_id", "household_id", "int_year", "int_month", "age", "gender", "year_born", "gov_region", "education_level", "job_status", "marital_status", "household_size")
+
+ukhls_7 <- import(paste0(path_ukhls, waves_ukhls[7], "_indresp.dta"))
+ukhls_7 <- ukhls_7 %>% mutate(data_code = "ukhls_g") %>% select(data_code, pidp, g_hidp, g_istrtdaty, g_istrtdatm, g_dvage, g_sex, g_birthy, g_gor_dv, g_hiqual_dv, g_jbstat, g_marstat_dv, g_hhsize)
+colnames(ukhls_7) <- c("data_code", "person_id", "household_id", "int_year", "int_month", "age", "gender", "year_born", "gov_region", "education_level", "job_status", "marital_status", "household_size")
+
+ukhls_8 <- import(paste0(path_ukhls, waves_ukhls[8], "_indresp.dta"))
+ukhls_8 <- ukhls_8 %>% mutate(data_code = "ukhls_h") %>% select(data_code, pidp, h_hidp, h_istrtdaty, h_istrtdatm, h_dvage, h_sex, h_birthy, h_gor_dv, h_hiqual_dv, h_jbstat, h_marstat_dv, h_hhsize)
+colnames(ukhls_8) <- c("data_code", "person_id", "household_id", "int_year", "int_month", "age", "gender", "year_born", "gov_region", "education_level", "job_status", "marital_status", "household_size")
+
+ukhls_9 <- import(paste0(path_ukhls, waves_ukhls[9], "_indresp.dta"))
+ukhls_9 <- ukhls_9 %>% mutate(data_code = "ukhls_i") %>% select(data_code, pidp, i_hidp, i_istrtdaty, i_istrtdatm, i_dvage, i_sex, i_birthy, i_gor_dv, i_hiqual_dv, i_jbstat, i_marstat_dv, i_hhsize)
+colnames(ukhls_9) <- c("data_code", "person_id", "household_id", "int_year", "int_month", "age", "gender", "year_born", "gov_region", "education_level", "job_status", "marital_status", "household_size")
+
+ukhls_10 <- import(paste0(path_ukhls, waves_ukhls[10], "_indresp.dta"))
+ukhls_10 <- ukhls_10 %>% mutate(data_code = "ukhls_j") %>% select(data_code, pidp, j_hidp, j_istrtdaty, j_istrtdatm, j_dvage, j_sex, j_birthy, j_gor_dv, j_hiqual_dv, j_jbstat, j_marstat_dv, j_hhsize)
+colnames(ukhls_10) <- c("data_code", "person_id", "household_id", "int_year", "int_month", "age", "gender", "year_born", "gov_region", "education_level", "job_status", "marital_status", "household_size")
+
+ukhls_11 <- import(paste0(path_ukhls, waves_ukhls[11], "_indresp.dta"))
+ukhls_11 <- ukhls_11 %>% mutate(data_code = "ukhls_k") %>% select(data_code, pidp, k_hidp, k_istrtdaty, k_istrtdatm, k_dvage, k_sex, k_birthy, k_gor_dv, k_hiqual_dv, k_jbstat, k_marstat_dv, k_hhsize)
+colnames(ukhls_11) <- c("data_code", "person_id", "household_id", "int_year", "int_month", "age", "gender", "year_born", "gov_region", "education_level", "job_status", "marital_status", "household_size")
+
+ukhls_12 <- import(paste0(path_ukhls, waves_ukhls[12], "_indresp.dta"))
+ukhls_12 <- ukhls_12 %>% mutate(data_code = "ukhls_l") %>% select(data_code, pidp, l_hidp, l_istrtdaty, l_istrtdatm, l_dvage, l_sex, l_birthy, l_gor_dv, l_hiqual_dv, l_jbstat, l_marstat_dv, l_hhsize)
+colnames(ukhls_12) <- c("data_code", "person_id", "household_id", "int_year", "int_month", "age", "gender", "year_born", "gov_region", "education_level", "job_status", "marital_status", "household_size")
+
+ukhls_13 <- import(paste0(path_ukhls, waves_ukhls[13], "_indresp.dta"), encoding = "UTF-8")
+ukhls_13 <- ukhls_13 %>% mutate(data_code = "ukhls_m") %>% select(data_code, pidp, m_hidp, m_istrtdaty, m_istrtdatm, m_dvage, m_sex, m_birthy, m_gor_dv, m_hiqual_dv, m_jbstat, m_marstat_dv, m_hhsize)
+colnames(ukhls_13) <- c("data_code", "person_id", "household_id", "int_year", "int_month", "age", "gender", "year_born", "gov_region", "education_level", "job_status", "marital_status", "household_size")
+
+ukhls_14 <- import(paste0(path_ukhls, waves_ukhls[14], "_indresp.dta"), encoding = "UTF-8")
+ukhls_14 <- ukhls_14 %>% mutate(data_code = "ukhls_n") %>% select(data_code, pidp, n_hidp, n_istrtdaty, n_istrtdatm, n_dvage, n_sex, n_birthy, n_gor_dv, n_hiqual_dv, n_jbstat, n_marstat_dv, n_hhsize)
+colnames(ukhls_14) <- c("data_code", "person_id", "household_id", "int_year", "int_month", "age", "gender", "year_born", "gov_region", "education_level", "job_status", "marital_status", "household_size")
+
+# combine waves
+data_ukhls_basevars <- ukhls_1 %>% bind_rows(ukhls_2, ukhls_3, ukhls_4, ukhls_5, ukhls_6, ukhls_7, ukhls_8, ukhls_9, ukhls_10, ukhls_11, ukhls_12, ukhls_13, ukhls_14)
+
+rm(ukhls_1, ukhls_2, ukhls_3, ukhls_4, ukhls_5, ukhls_6, ukhls_7, ukhls_8, ukhls_9, ukhls_10, ukhls_11, ukhls_12, ukhls_13, ukhls_14)
+
+```
+
+# combine bhps and ukhls data
+```{r}
+data_basevars <- data_bhps_basevars %>% bind_rows(data_ukhls_basevars)
+
+rm(data_bhps_basevars, data_ukhls_basevars)
+
+```
+
+# load LAD data
+```{r}
+bhps_lad_1 <- import(paste0(path_bhps_lad, waves_bhps[1], "_oslaua_protect.dta")) %>% mutate(data_code = "bhps_ba") %>% select(-1)
+colnames(bhps_lad_1) <- c("household_id", "lad_code", "data_code")
+
+bhps_lad_2 <- import(paste0(path_bhps_lad, waves_bhps[2], "_oslaua_protect.dta")) %>% mutate(data_code = "bhps_bb") %>% select(-1)
+colnames(bhps_lad_2) <- c("household_id", "lad_code", "data_code")
+
+bhps_lad_3 <- import(paste0(path_bhps_lad, waves_bhps[3], "_oslaua_protect.dta")) %>% mutate(data_code = "bhps_bc") %>% select(-1)
+colnames(bhps_lad_3) <- c("household_id", "lad_code", "data_code")
+
+bhps_lad_4 <- import(paste0(path_bhps_lad, waves_bhps[4], "_oslaua_protect.dta")) %>% mutate(data_code = "bhps_bd") %>% select(-1)
+colnames(bhps_lad_4) <- c("household_id", "lad_code", "data_code")
+
+bhps_lad_5 <- import(paste0(path_bhps_lad, waves_bhps[5], "_oslaua_protect.dta")) %>% mutate(data_code = "bhps_be") %>% select(-1)
+colnames(bhps_lad_5) <- c("household_id", "lad_code", "data_code")
+
+bhps_lad_6 <- import(paste0(path_bhps_lad, waves_bhps[6], "_oslaua_protect.dta")) %>% mutate(data_code = "bhps_bf") %>% select(-1)
+colnames(bhps_lad_6) <- c("household_id", "lad_code", "data_code")
+
+bhps_lad_7 <- import(paste0(path_bhps_lad, waves_bhps[7], "_oslaua_protect.dta")) %>% mutate(data_code = "bhps_bg") %>% select(-1)
+colnames(bhps_lad_7) <- c("household_id", "lad_code", "data_code")
+
+bhps_lad_8 <- import(paste0(path_bhps_lad, waves_bhps[8], "_oslaua_protect.dta")) %>% mutate(data_code = "bhps_bh") %>% select(-1)
+colnames(bhps_lad_8) <- c("household_id", "lad_code", "data_code")
+
+bhps_lad_9 <- import(paste0(path_bhps_lad, waves_bhps[9], "_oslaua_protect.dta")) %>% mutate(data_code = "bhps_bi") %>% select(-1)
+colnames(bhps_lad_9) <- c("household_id", "lad_code", "data_code")
+
+bhps_lad_10 <- import(paste0(path_bhps_lad, waves_bhps[10], "_oslaua_protect.dta")) %>% mutate(data_code = "bhps_bj") %>% select(-1)
+colnames(bhps_lad_10) <- c("household_id", "lad_code", "data_code")
+
+bhps_lad_11 <- import(paste0(path_bhps_lad, waves_bhps[11], "_oslaua_protect.dta")) %>% mutate(data_code = "bhps_bk") %>% select(-1)
+colnames(bhps_lad_11) <- c("household_id", "lad_code", "data_code")
+
+bhps_lad_12 <- import(paste0(path_bhps_lad, waves_bhps[12], "_oslaua_protect.dta")) %>% mutate(data_code = "bhps_bl") %>% select(-1)
+colnames(bhps_lad_12) <- c("household_id", "lad_code", "data_code")
+
+bhps_lad_13 <- import(paste0(path_bhps_lad, waves_bhps[13], "_oslaua_protect.dta")) %>% mutate(data_code = "bhps_bm") %>% select(-1)
+colnames(bhps_lad_13) <- c("household_id", "lad_code", "data_code")
+
+bhps_lad_14 <- import(paste0(path_bhps_lad, waves_bhps[14], "_oslaua_protect.dta")) %>% mutate(data_code = "bhps_bn") %>% select(-1)
+colnames(bhps_lad_14) <- c("household_id", "lad_code", "data_code")
+
+bhps_lad_15 <- import(paste0(path_bhps_lad, waves_bhps[15], "_oslaua_protect.dta")) %>% mutate(data_code = "bhps_bo") %>% select(-1)
+colnames(bhps_lad_15) <- c("household_id", "lad_code", "data_code")
+
+bhps_lad_16 <- import(paste0(path_bhps_lad, waves_bhps[16], "_oslaua_protect.dta")) %>% mutate(data_code = "bhps_bp") %>% select(-1)
+colnames(bhps_lad_16) <- c("household_id", "lad_code", "data_code")
+
+bhps_lad_17 <- import(paste0(path_bhps_lad, waves_bhps[17], "_oslaua_protect.dta")) %>% mutate(data_code = "bhps_bq") %>% select(-1)
+colnames(bhps_lad_17) <- c("household_id", "lad_code", "data_code")
+
+bhps_lad_18 <- import(paste0(path_bhps_lad, waves_bhps[18], "_oslaua_protect.dta")) %>% mutate(data_code = "bhps_br") %>% select(-1)
+colnames(bhps_lad_18) <- c("household_id", "lad_code", "data_code")
+
+ukhls_lad_1 <- import(paste0(path_ukhls_lad, waves_ukhls[1], "_oslaua_protect.dta")) %>% mutate(data_code = "ukhls_a") %>% select(-3)
+colnames(ukhls_lad_1) <- c("household_id", "lad_code", "data_code")
+
+ukhls_lad_2 <- import(paste0(path_ukhls_lad, waves_ukhls[2], "_oslaua_protect.dta")) %>% mutate(data_code = "ukhls_b") %>% select(-3)
+colnames(ukhls_lad_2) <- c("household_id", "lad_code", "data_code")
+
+ukhls_lad_3 <- import(paste0(path_ukhls_lad, waves_ukhls[3], "_oslaua_protect.dta")) %>% mutate(data_code = "ukhls_c") %>% select(-3)
+colnames(ukhls_lad_3) <- c("household_id", "lad_code", "data_code")
+
+ukhls_lad_4 <- import(paste0(path_ukhls_lad, waves_ukhls[4], "_oslaua_protect.dta")) %>% mutate(data_code = "ukhls_d") %>% select(-3)
+colnames(ukhls_lad_4) <- c("household_id", "lad_code", "data_code")
+
+ukhls_lad_5 <- import(paste0(path_ukhls_lad, waves_ukhls[5], "_oslaua_protect.dta")) %>% mutate(data_code = "ukhls_e") %>% select(-3)
+colnames(ukhls_lad_5) <- c("household_id", "lad_code", "data_code")
+
+ukhls_lad_6 <- import(paste0(path_ukhls_lad, waves_ukhls[6], "_oslaua_protect.dta")) %>% mutate(data_code = "ukhls_f") %>% select(-3)
+colnames(ukhls_lad_6) <- c("household_id", "lad_code", "data_code")
+
+ukhls_lad_7 <- import(paste0(path_ukhls_lad, waves_ukhls[7], "_oslaua_protect.dta")) %>% mutate(data_code = "ukhls_g") %>% select(-3)
+colnames(ukhls_lad_7) <- c("household_id", "lad_code", "data_code")
+
+ukhls_lad_8 <- import(paste0(path_ukhls_lad, waves_ukhls[8], "_oslaua_protect.dta")) %>% mutate(data_code = "ukhls_h") %>% select(-3)
+colnames(ukhls_lad_8) <- c("household_id", "lad_code", "data_code")
+
+ukhls_lad_9 <- import(paste0(path_ukhls_lad, waves_ukhls[9], "_oslaua_protect.dta")) %>% mutate(data_code = "ukhls_i") %>% select(-3)
+colnames(ukhls_lad_9) <- c("household_id", "lad_code", "data_code")
+
+ukhls_lad_10 <- import(paste0(path_ukhls_lad, waves_ukhls[10], "_oslaua_protect.dta")) %>% mutate(data_code = "ukhls_j") %>% select(-3)
+colnames(ukhls_lad_10) <- c("household_id", "lad_code", "data_code")
+
+ukhls_lad_11 <- import(paste0(path_ukhls_lad, waves_ukhls[11], "_oslaua_protect.dta")) %>% mutate(data_code = "ukhls_k") %>% select(-3)
+colnames(ukhls_lad_11) <- c("household_id", "lad_code", "data_code")
+
+ukhls_lad_12 <- import(paste0(path_ukhls_lad, waves_ukhls[12], "_oslaua_protect.dta")) %>% mutate(data_code = "ukhls_l") %>% select(-3)
+colnames(ukhls_lad_12) <- c("household_id", "lad_code", "data_code")
+
+ukhls_lad_13 <- import(paste0(path_ukhls_lad, waves_ukhls[13], "_oslaua_protect.dta")) %>% mutate(data_code = "ukhls_m") %>% select(-3)
+colnames(ukhls_lad_13) <- c("household_id", "lad_code", "data_code")
+
+ukhls_lad_14 <- import(paste0(path_ukhls_lad, waves_ukhls[14], "_oslaua_protect.dta")) %>% mutate(data_code = "ukhls_n") %>% select(-3)
+colnames(ukhls_lad_14) <- c("household_id", "lad_code", "data_code")
+
+data_lads <- bhps_lad_1 %>% bind_rows(bhps_lad_2, bhps_lad_3, bhps_lad_4, bhps_lad_5, bhps_lad_6, bhps_lad_7, bhps_lad_8, bhps_lad_9, bhps_lad_10, bhps_lad_11, bhps_lad_12, bhps_lad_13, bhps_lad_14, bhps_lad_15, bhps_lad_16, bhps_lad_17, bhps_lad_18, ukhls_lad_1, ukhls_lad_2, ukhls_lad_3, ukhls_lad_4, ukhls_lad_5, ukhls_lad_6, ukhls_lad_7, ukhls_lad_8, ukhls_lad_9, ukhls_lad_10, ukhls_lad_11, ukhls_lad_12, ukhls_lad_13, ukhls_lad_14)
+
+rm(path_bhps_lad, path_ukhls_lad, bhps_lad_1, bhps_lad_2, bhps_lad_3, bhps_lad_4, bhps_lad_5, bhps_lad_6, bhps_lad_7, bhps_lad_8, bhps_lad_9, bhps_lad_10, bhps_lad_11, bhps_lad_12, bhps_lad_13, bhps_lad_14, bhps_lad_15, bhps_lad_16, bhps_lad_17, bhps_lad_18, ukhls_lad_1, ukhls_lad_2, ukhls_lad_3, ukhls_lad_4, ukhls_lad_5, ukhls_lad_6, ukhls_lad_7, ukhls_lad_8, ukhls_lad_9, ukhls_lad_10, ukhls_lad_11, ukhls_lad_12, ukhls_lad_13, ukhls_lad_14)
+
+```
+
+# merge basevars with lad information
+```{r}
+data_preprocessed <- data_basevars %>% left_join(data_lads, by = c("data_code", "household_id")) %>% ungroup()
+
+data_preprocessed <- data_preprocessed %>% arrange(person_id, int_year)
+
+rm(data_basevars, data_lads)
+
+```
+
+# load household data
+```{r}
+bhps_1 <- import(paste0(path_bhps, waves_bhps[1], "_hhresp.dta"))
+bhps_1 <- bhps_1 %>% mutate(data_code = "bhps_ba") %>% select(data_code, ba_hidp, ba_hhneti, ba_fihhmb, ba_nkids_dv)
+colnames(bhps_1) <- c("data_code", "household_id", "hh_net_income", "hh_benefit_income", "children_in_hh")
+
+bhps_2 <- import(paste0(path_bhps, waves_bhps[2], "_hhresp.dta"))
+bhps_2 <- bhps_2 %>% mutate(data_code = "bhps_bb") %>% select(data_code, bb_hidp, bb_hhneti, bb_fihhmb, bb_nkids_dv)
+colnames(bhps_2) <- c("data_code", "household_id", "hh_net_income", "hh_benefit_income", "children_in_hh")
+
+bhps_3 <- import(paste0(path_bhps, waves_bhps[3], "_hhresp.dta"))
+bhps_3 <- bhps_3 %>% mutate(data_code = "bhps_bc") %>% select(data_code, bc_hidp, bc_hhneti, bc_fihhmb, bc_nkids_dv)
+colnames(bhps_3) <- c("data_code", "household_id", "hh_net_income", "hh_benefit_income", "children_in_hh")
+
+bhps_4 <- import(paste0(path_bhps, waves_bhps[4], "_hhresp.dta"))
+bhps_4 <- bhps_4 %>% mutate(data_code = "bhps_bd") %>% select(data_code, bd_hidp, bd_hhneti, bd_fihhmb, bd_nkids_dv)
+colnames(bhps_4) <- c("data_code", "household_id", "hh_net_income", "hh_benefit_income", "children_in_hh")
+
+bhps_5 <- import(paste0(path_bhps, waves_bhps[5], "_hhresp.dta"))
+bhps_5 <- bhps_5 %>% mutate(data_code = "bhps_be") %>% select(data_code, be_hidp, be_hhneti, be_fihhmb, be_nkids_dv)
+colnames(bhps_5) <- c("data_code", "household_id", "hh_net_income", "hh_benefit_income", "children_in_hh")
+
+bhps_6 <- import(paste0(path_bhps, waves_bhps[6], "_hhresp.dta"))
+bhps_6 <- bhps_6 %>% mutate(data_code = "bhps_bf") %>% select(data_code, bf_hidp, bf_hhneti, bf_fihhmb, bf_nkids_dv)
+colnames(bhps_6) <- c("data_code", "household_id", "hh_net_income", "hh_benefit_income", "children_in_hh")
+
+bhps_7 <- import(paste0(path_bhps, waves_bhps[7], "_hhresp.dta"))
+bhps_7 <- bhps_7 %>% mutate(data_code = "bhps_bg") %>% select(data_code, bg_hidp, bg_hhneti, bg_fihhmb, bg_nkids_dv)
+colnames(bhps_7) <- c("data_code", "household_id", "hh_net_income", "hh_benefit_income", "children_in_hh")
+
+bhps_8 <- import(paste0(path_bhps, waves_bhps[8], "_hhresp.dta"))
+bhps_8 <- bhps_8 %>% mutate(data_code = "bhps_bh") %>% select(data_code, bh_hidp, bh_hhneti, bh_fihhmb, bh_nkids_dv)
+colnames(bhps_8) <- c("data_code", "household_id", "hh_net_income", "hh_benefit_income", "children_in_hh")
+
+bhps_9 <- import(paste0(path_bhps, waves_bhps[9], "_hhresp.dta"))
+bhps_9 <- bhps_9 %>% mutate(data_code = "bhps_bi") %>% select(data_code, bi_hidp, bi_hhneti, bi_fihhmb, bi_nkids_dv)
+colnames(bhps_9) <- c("data_code", "household_id", "hh_net_income", "hh_benefit_income", "children_in_hh")
+
+bhps_10 <- import(paste0(path_bhps, waves_bhps[10], "_hhresp.dta"))
+bhps_10 <- bhps_10 %>% mutate(data_code = "bhps_bj") %>% select(data_code, bj_hidp, bj_hhneti, bj_fihhmb, bj_nkids_dv)
+colnames(bhps_10) <- c("data_code", "household_id", "hh_net_income", "hh_benefit_income", "children_in_hh")
+
+bhps_11 <- import(paste0(path_bhps, waves_bhps[11], "_hhresp.dta"))
+bhps_11 <- bhps_11 %>% mutate(data_code = "bhps_bk") %>% select(data_code, bk_hidp, bk_hhneti, bk_fihhmb, bk_nkids_dv)
+colnames(bhps_11) <- c("data_code", "household_id", "hh_net_income", "hh_benefit_income", "children_in_hh")
+
+bhps_12 <- import(paste0(path_bhps, waves_bhps[12], "_hhresp.dta"))
+bhps_12 <- bhps_12 %>% mutate(data_code = "bhps_bl") %>% select(data_code, bl_hidp, bl_hhneti, bl_fihhmb, bl_nkids_dv)
+colnames(bhps_12) <- c("data_code", "household_id", "hh_net_income", "hh_benefit_income", "children_in_hh")
+
+bhps_13 <- import(paste0(path_bhps, waves_bhps[13], "_hhresp.dta"))
+bhps_13 <- bhps_13 %>% mutate(data_code = "bhps_bm") %>% select(data_code, bm_hidp, bm_hhneti, bm_fihhmb, bm_nkids_dv)
+colnames(bhps_13) <- c("data_code", "household_id", "hh_net_income", "hh_benefit_income", "children_in_hh")
+
+bhps_14 <- import(paste0(path_bhps, waves_bhps[14], "_hhresp.dta"))
+bhps_14 <- bhps_14 %>% mutate(data_code = "bhps_bn") %>% select(data_code, bn_hidp, bn_hhneti, bn_fihhmb, bn_nkids_dv)
+colnames(bhps_14) <- c("data_code", "household_id", "hh_net_income", "hh_benefit_income", "children_in_hh")
+
+bhps_15 <- import(paste0(path_bhps, waves_bhps[15], "_hhresp.dta"))
+bhps_15 <- bhps_15 %>% mutate(data_code = "bhps_bo") %>% select(data_code, bo_hidp, bo_hhneti, bo_fihhmb, bo_nkids_dv)
+colnames(bhps_15) <- c("data_code", "household_id", "hh_net_income", "hh_benefit_income", "children_in_hh")
+
+bhps_16 <- import(paste0(path_bhps, waves_bhps[16], "_hhresp.dta"))
+bhps_16 <- bhps_16 %>% mutate(data_code = "bhps_bp") %>% select(data_code, bp_hidp, bp_hhneti, bp_fihhmb, bp_nkids_dv)
+colnames(bhps_16) <- c("data_code", "household_id", "hh_net_income", "hh_benefit_income", "children_in_hh")
+
+bhps_17 <- import(paste0(path_bhps, waves_bhps[17], "_hhresp.dta"))
+bhps_17 <- bhps_17 %>% mutate(data_code = "bhps_bq") %>% select(data_code, bq_hidp, bq_hhneti, bq_fihhmb, bq_nkids_dv)
+colnames(bhps_17) <- c("data_code", "household_id", "hh_net_income", "hh_benefit_income", "children_in_hh")
+
+bhps_18 <- import(paste0(path_bhps, waves_bhps[18], "_hhresp.dta"))
+bhps_18 <- bhps_18 %>% mutate(data_code = "bhps_br") %>% select(data_code, br_hidp, br_hhneti, br_fihhmb, br_nkids_dv)
+colnames(bhps_18) <- c("data_code", "household_id", "hh_net_income", "hh_benefit_income", "children_in_hh")
+
+data_bhps_hhvars <- bhps_1 %>% bind_rows(bhps_2, bhps_3, bhps_4, bhps_5, bhps_6, bhps_7, bhps_8, bhps_9, bhps_10, bhps_11, bhps_12, bhps_13, bhps_14, bhps_15, bhps_16, bhps_17, bhps_18)
+
+rm(bhps_1, bhps_2, bhps_3, bhps_4, bhps_5, bhps_6, bhps_7, bhps_8, bhps_9, bhps_10, bhps_11, bhps_12, bhps_13, bhps_14, bhps_15, bhps_16, bhps_17, bhps_18)
+
+ukhls_1 <- import(paste0(path_ukhls, waves_ukhls[1], "_hhresp.dta"), encoding = "UTF-8")
+ukhls_1 <- ukhls_1 %>% mutate(data_code = "ukhls_a") %>% select(data_code, a_hidp, a_fihhmnnet1_dv, a_fihhmnsben_dv, a_nkids_dv)
+colnames(ukhls_1) <- c("data_code", "household_id", "hh_net_income", "hh_benefit_income", "children_in_hh")
+
+ukhls_2 <- import(paste0(path_ukhls, waves_ukhls[2], "_hhresp.dta"), encoding = "UTF-8")
+ukhls_2 <- ukhls_2 %>% mutate(data_code = "ukhls_b") %>% select(data_code, b_hidp, b_fihhmnnet1_dv, b_fihhmnsben_dv, b_nkids_dv)
+colnames(ukhls_2) <- c("data_code", "household_id", "hh_net_income", "hh_benefit_income", "children_in_hh")
+
+ukhls_3 <- import(paste0(path_ukhls, waves_ukhls[3], "_hhresp.dta"), encoding = "UTF-8")
+ukhls_3 <- ukhls_3 %>% mutate(data_code = "ukhls_c") %>% select(data_code, c_hidp, c_fihhmnnet1_dv, c_fihhmnsben_dv, c_nkids_dv)
+colnames(ukhls_3) <- c("data_code", "household_id", "hh_net_income", "hh_benefit_income", "children_in_hh")
+
+ukhls_4 <- import(paste0(path_ukhls, waves_ukhls[4], "_hhresp.dta"), encoding = "UTF-8")
+ukhls_4 <- ukhls_4 %>% mutate(data_code = "ukhls_d") %>% select(data_code, d_hidp, d_fihhmnnet1_dv, d_fihhmnsben_dv, d_nkids_dv)
+colnames(ukhls_4) <- c("data_code", "household_id", "hh_net_income", "hh_benefit_income", "children_in_hh")
+
+ukhls_5 <- import(paste0(path_ukhls, waves_ukhls[5], "_hhresp.dta"), encoding = "UTF-8")
+ukhls_5 <- ukhls_5 %>% mutate(data_code = "ukhls_e") %>% select(data_code, e_hidp, e_fihhmnnet1_dv, e_fihhmnsben_dv, e_nkids_dv)
+colnames(ukhls_5) <- c("data_code", "household_id", "hh_net_income", "hh_benefit_income", "children_in_hh")
+
+ukhls_6 <- import(paste0(path_ukhls, waves_ukhls[6], "_hhresp.dta"), encoding = "UTF-8")
+ukhls_6 <- ukhls_6 %>% mutate(data_code = "ukhls_f") %>% select(data_code, f_hidp, f_fihhmnnet1_dv, f_fihhmnsben_dv, f_nkids_dv)
+colnames(ukhls_6) <- c("data_code", "household_id", "hh_net_income", "hh_benefit_income", "children_in_hh")
+
+ukhls_7 <- import(paste0(path_ukhls, waves_ukhls[7], "_hhresp.dta"), encoding = "UTF-8")
+ukhls_7 <- ukhls_7 %>% mutate(data_code = "ukhls_g") %>% select(data_code, g_hidp, g_fihhmnnet1_dv, g_fihhmnsben_dv, g_nkids_dv)
+colnames(ukhls_7) <- c("data_code", "household_id", "hh_net_income", "hh_benefit_income", "children_in_hh")
+
+ukhls_8 <- import(paste0(path_ukhls, waves_ukhls[8], "_hhresp.dta"), encoding = "UTF-8")
+ukhls_8 <- ukhls_8 %>% mutate(data_code = "ukhls_h") %>% select(data_code, h_hidp, h_fihhmnnet1_dv, h_fihhmnsben_dv, h_nkids_dv)
+colnames(ukhls_8) <- c("data_code", "household_id", "hh_net_income", "hh_benefit_income", "children_in_hh")
+
+ukhls_9 <- import(paste0(path_ukhls, waves_ukhls[9], "_hhresp.dta"), encoding = "UTF-8")
+ukhls_9 <- ukhls_9 %>% mutate(data_code = "ukhls_i") %>% select(data_code, i_hidp, i_fihhmnnet1_dv, i_fihhmnsben_dv, i_nkids_dv)
+colnames(ukhls_9) <- c("data_code", "household_id", "hh_net_income", "hh_benefit_income", "children_in_hh")
+
+ukhls_10 <- import(paste0(path_ukhls, waves_ukhls[10], "_hhresp.dta"), encoding = "UTF-8")
+ukhls_10 <- ukhls_10 %>% mutate(data_code = "ukhls_j") %>% select(data_code, j_hidp, j_fihhmnnet1_dv, j_fihhmnsben_dv, j_nkids_dv)
+colnames(ukhls_10) <- c("data_code", "household_id", "hh_net_income", "hh_benefit_income", "children_in_hh")
+
+ukhls_11 <- import(paste0(path_ukhls, waves_ukhls[11], "_hhresp.dta"), encoding = "UTF-8")
+ukhls_11 <- ukhls_11 %>% mutate(data_code = "ukhls_k") %>% select(data_code, k_hidp, k_fihhmnnet1_dv, k_fihhmnsben_dv, k_nkids_dv)
+colnames(ukhls_11) <- c("data_code", "household_id", "hh_net_income", "hh_benefit_income", "children_in_hh")
+
+ukhls_12 <- import(paste0(path_ukhls, waves_ukhls[12], "_hhresp.dta"), encoding = "UTF-8")
+ukhls_12 <- ukhls_12 %>% mutate(data_code = "ukhls_l") %>% select(data_code, l_hidp, l_fihhmnnet1_dv, l_fihhmnsben_dv, l_nkids_dv)
+colnames(ukhls_12) <- c("data_code", "household_id", "hh_net_income", "hh_benefit_income", "children_in_hh")
+
+ukhls_13 <- import(paste0(path_ukhls, waves_ukhls[13], "_hhresp.dta"), encoding = "UTF-8")
+ukhls_13 <- ukhls_13 %>% mutate(data_code = "ukhls_m") %>% select(data_code, m_hidp, m_fihhmnnet1_dv, m_fihhmnsben_dv, m_nkids_dv)
+colnames(ukhls_13) <- c("data_code", "household_id", "hh_net_income", "hh_benefit_income", "children_in_hh")
+
+ukhls_14 <- import(paste0(path_ukhls, waves_ukhls[14], "_hhresp.dta"), encoding = "UTF-8")
+ukhls_14 <- ukhls_14 %>% mutate(data_code = "ukhls_n") %>% select(data_code, n_hidp, n_fihhmnnet1_dv, n_fihhmnsben_dv, n_nkids_dv)
+colnames(ukhls_14) <- c("data_code", "household_id", "hh_net_income", "hh_benefit_income", "children_in_hh")
+
+data_ukhls_hhvars <- ukhls_1 %>% bind_rows(ukhls_2, ukhls_3, ukhls_4, ukhls_5, ukhls_6, ukhls_7, ukhls_8, ukhls_9, ukhls_10, ukhls_11, ukhls_12, ukhls_13, ukhls_14)
+
+rm(path_ukhls, path_bhps, waves_ukhls, waves_bhps, ukhls_1, ukhls_2, ukhls_3, ukhls_4, ukhls_5, ukhls_6, ukhls_7, ukhls_8, ukhls_9, ukhls_10, ukhls_11, ukhls_12, ukhls_13, ukhls_14)
+
+```
+
+# combine with base vars
+```{r}
+data_hhvars <- data_bhps_hhvars %>% bind_rows(data_ukhls_hhvars)
+
+data_preprocessed <- data_preprocessed %>% left_join(data_hhvars, by = c("household_id", "data_code"))
+
+rm(data_hhvars, data_bhps_hhvars, data_ukhls_hhvars)
+
+```
+
+# save data
+```{r}
+save.image("data_processed/01_data_preprocessed.RData")
+
+```
+
+```{r}
+
+```
+
